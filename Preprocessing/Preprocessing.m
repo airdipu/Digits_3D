@@ -1,10 +1,12 @@
-clear all
-clc
-addpath('training_data');
+clear all;
+clc;
 
-data = dir('training_data');
-N = size(files, 1);
-%n x m - new size of image
+% Adding the path of data
+addpath('training_data');
+data_dir = dir('training_data');
+N = size(data_dir, 1);
+
+% Resizing of images
 n = 40;
 m = 40;
 imgSize = n * m;
