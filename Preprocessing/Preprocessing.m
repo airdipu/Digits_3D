@@ -6,18 +6,18 @@ addpath('training_data');
 data_dir = dir('training_data');
 N = size(data_dir, 1);
 
-% Resizing of images
-n = 40;
-m = 40;
-imgSize = n * m;
-data = zeros(N - 2, imgSize);
+% Resizing the images
+l = 50;
+w = 50;
+im_resize = l * w;
+data = zeros(N - 2, im_resize);
 
 for i = 3 : N
-        I = load(files(i).name);
-        pos = I.pos;
+        I = load(data_dir(i).name);
+        position = I.pos;
 
-        X = pos(:, 1);                  %first dimension
-        Y = pos(:, 2);                  %second dimension
+        X = position(:, 1);                  %first dimension
+        Y = position(:, 2);                  %second dimension
         figure('visible', 'off');       %to see images, comment this line
         axis auto
         f1 = plot(X, Y);                %plotting the image using 2 dims
@@ -25,7 +25,7 @@ for i = 3 : N
         saveas(f1, 'img', 'png');       %making an image object
         %print('img2','-dpng', '-noui')
         img = imread('img.png');
-        img = imresize(img,[n m]);      %resizing all images to one size 
+        img = imresize(img,[l w]);      %resizing all images to one size 
         %img = rgb2gray(img);           %1)grayscale preprocessing
         img = im2bw(img, 0.99);         %2)binarization
         imshow(img);
