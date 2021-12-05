@@ -31,8 +31,7 @@ for i = 3 : N
         im_read = imread('fig.png');
         im_size = imresize(im_read,[l w]);      %resizing all images to one size 
         im_logical = im2bw(im_size, 0.99); %imbinarize(img);            % Creating logical data
-        array_line = reshape(im_logical, 1, []);       % Array of pixels to line
-        %data(i - 2,:) = array_line;             % Saving into data table
+        data(i - 2,:) = reshape(im_logical, 1, []);       % Array of pixels to line
         disp(i);
 end
 
