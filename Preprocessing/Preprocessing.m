@@ -35,5 +35,6 @@ for i = 3 : N
 
 end
 
+%data = data / 255;
 save('data.mat', 'data', 'class');               % Save the data 
 %, 'class'
