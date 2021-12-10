@@ -213,6 +213,72 @@ for l = 1:size(stroke_size_combine, 2)
 end
 
 
+% Classify
+
+% Loading data
+load('data_combine.mat')
+load('stroke_size_combine.mat')
+load('n_class_combine.mat')
+
+
+% Projecion on y and x
+% define equations --> find parameter
+
+step_size = 0.0500;                         % Since 3 decimal numbers for
+                                            % the recording of the 
+                                            % coordinates per axis
+% Processing for the amount of projections
+projection_y = zeros(size(0:step_size:1, 2), 1);
+
+% Processing for the amount of projections
+projection_x = zeros(size(0:step_size:1, 2), 1);
+
+% Processing of projections for all observations
+profil_y = zeros(size(0:step_size:1, 2), size(data_combine, 3));
+profil_x = zeros(size(0:step_size:1, 2), size(data_combine, 3));
+
+for k = 1:size(data_combine, 3)
+    for y = 0:step_size:1
+        l1 = 0;                             % For projection on y
+        l2 = 0;                             % For projection on x
+        for q = 1:stroke_size_combine(k) - 1% -1 since also use of q+1
+            % If the first point is smaller than the second point, the
+            % solver can find a slope
+            if data_combine(q, 1, k) < data_combine(q+1, 1, k)
+                x1 = data_combine(q, 1, k);
+                y1 = data_combine(q, 2, k);
+                x2 = data_combine(q+1, 1, k);
+                y2 = data_combine(q+1, 2, k);
+            else
+                x2 = data_combine(q, 1, k);
+                y2 = data_combine(q, 2, k);
+                x1 = data_combine(q+1, 1, k);
+                y1 = data_combine(q+1, 2, k);
+            end
+            
+            a = (y2 - y1)/(x2 - x1);        % For y-slope
+            b = y1 - (a*x1);                % Intersect for y
+            x_val = (y - b)/a;
+            % Close and open interval
+            if x_val >= min([x1, x2]) && x_val < max([x1, x2])
+                l1 = l1 + 1;
+            end
+            y_val = a*y + b;
+            % Close and open interval
+            if y_val >= min([y1, y2]) && y_val < max([y1, y2])
+                l2 = l2 + 1;
+            end
+        end
+        l1 = projection_y(round((y + step_size)/step_size));
+        l2 = projection_x(round((y + step_size)/step_size));
+    end
+    project_y = profil_y(:, k);
+    project_x = profil_x(:, k);
+    
+end
+
+
+
 
 
 
