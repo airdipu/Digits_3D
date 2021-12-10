@@ -64,7 +64,7 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
     for j=1:size(data_in, 3)                % Size of data (3rd dim)
         angle = deg2rad(rotation_angle(i)); % Changing degree to radian
 
-        % Rotation around x (Using DIIP)
+        % Rotation around x axis (Using DIIP)
         rotate_around = [cos(theta) 0 sin(theta); 0 1 0; - sin(theta) 0 ...
             cos(theta)];
 
@@ -75,8 +75,8 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
             min(data_rotation, [], 1))./repmat((max(data_rotation, [] , ...
             1) - min(data_rotation, [], 1)), size(data_rotation, 1), 1);
         
-        % Each step of j one new matrix is adapted from the zeros matrix in the
-        % third dimension of the data_rotation matrix
+        % Each step of j a new matrix adapted from the initial matrix
+        % in 3rd dimension of the data_rotation matrix
     end
 end
 
