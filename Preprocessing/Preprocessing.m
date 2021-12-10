@@ -65,15 +65,17 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
         angle = deg2rad(rotation_angle(i)); % Changing degree to radian
 
         % Rotation around x axis (Using DIIP)
-        rotate_around = [cos(theta) 0 sin(theta); 0 1 0; - sin(theta) 0 ...
-            cos(theta)];
+        rotate_around_x = [cos(angle) 0 sin(angle); 0 1 0; - sin(angle) ...
+            0 cos(angle)];
 
-        data_rotation = inputdata(1:stroke_size(j), :, j)*rotate_around;
+        data_rotation_x = inputdata(1:stroke_size(j), :, j)* ...
+            rotate_around_x;
         
-        n_rotation_x_data(1:size(data_rotation, 1), :, ...
-            (i-1)*size(data_in, 3) + j) = bsxfun(@minus, data_rotation, ...
-            min(data_rotation, [], 1))./repmat((max(data_rotation, [] , ...
-            1) - min(data_rotation, [], 1)), size(data_rotation, 1), 1);
+        n_rotation_x_data(1:size(data_rotation_x, 1), :, ...
+            (i-1)*size(data_in, 3) + j) = bsxfun(@minus, ...
+            data_rotation_x, min(data_rotation_x, [], 1))...
+            ./repmat((max(data_rotation_x, [] , 1) - ...
+            min(data_rotation_x, [], 1)), size(data_rotation_x, 1), 1);
         
         % Each step of j a new matrix adapted from the initial matrix
         % in 3rd dimension of the data_rotation matrix
@@ -85,6 +87,85 @@ n_rotation_x_data = repmat(data_class, size(rotation_angle, 2), 1);
 save ('n_rotation_x_data.mat','n_rotation_x_data')
 save ('stroke_size_x_rotation.mat','stroke_size_x_rotation')
 save ('n_rotation_x_data.mat','n_rotation_x_data')
+
+
+
+% Rotation on y-axis
+
+% Processing
+n_rotation_y_data = zeros(100, 3, size(data_in, 3)* ...
+    size(rotation_angle, 2));
+
+stroke_size_y_rotation = repmat(stroke_size, 1, size(rotation_angle, 2));
+
+for i=1:size(rotation_angle, 2)             % Size of rotation vector
+    for j=1:size(data_in, 3)                % Size of data (3rd dim)
+        angle = deg2rad(rotation_angle(i)); % Changing degree to radian
+
+        % Rotation around y axis (Using DIIP)
+        rotate_around_y = [cos(angle) 0 -sin(angle); 0 1 0; sin(angle) ...
+            0 cos(angle)];
+
+        data_rotation_y = inputdata(1:stroke_size(j), :, j)* ...
+            rotate_around_y;
+        
+        n_rotation_y_data(1:size(data_rotation_y, 1), :, ...
+            (i-1)*size(data_in, 3) + j) = bsxfun(@minus, ...
+            data_rotation_y, min(data_rotation_y, [], 1))...
+            ./repmat((max(data_rotation_y, [] , 1) - ...
+            min(data_rotation_y, [], 1)), size(data_rotation_y, 1), 1);
+        
+        % Each step of j a new matrix adapted from the initial matrix
+        % in 3rd dimension of the data_rotation matrix
+    end
+end
+
+n_rotation_y_data = repmat(data_class, size(rotation_angle, 2), 1);
+
+save ('n_rotation_y_data.mat','n_rotation_y_data')
+save ('stroke_size_y_rotation.mat','stroke_size_y_rotation')
+save ('n_rotation_y_data.mat','n_rotation_y_data')
+
+
+
+% Rotation on z-axis
+
+% Processing
+n_rotation_z_data = zeros(100, 3, size(data_in, 3)* ...
+    size(rotation_angle, 2));
+
+stroke_size_z_rotation = repmat(stroke_size, 1, size(rotation_angle, 2));
+
+for i=1:size(rotation_angle, 2)             % Size of rotation vector
+    for j=1:size(data_in, 3)                % Size of data (3rd dim)
+        angle = deg2rad(rotation_angle(i)); % Changing degree to radian
+
+        % Rotation around z axis (Using DIIP)
+        rotate_around_z = [cos(angle) sin(angle) 0; -sin(angle) ...
+            cos(angle) 0; 0 0 1];
+
+        data_rotation_z = inputdata(1:stroke_size(j), :, j)* ...
+            rotate_around_y;
+        
+        n_rotation_z_data(1:size(data_rotation_z, 1), :, ...
+            (i-1)*size(data_in, 3) + j) = bsxfun(@minus, ...
+            data_rotation_z, min(data_rotation_z, [], 1))...
+            ./repmat((max(data_rotation_z, [] , 1) - ...
+            min(data_rotation_z, [], 1)), size(data_rotation_z, 1), 1);
+        
+        % Each step of j a new matrix adapted from the initial matrix
+        % in 3rd dimension of the data_rotation matrix
+    end
+end
+
+n_rotation_z_data = repmat(data_class, size(rotation_angle, 2), 1);
+
+save ('n_rotation_z_data.mat','n_rotation_z_data')
+save ('stroke_size_z_rotation.mat','stroke_size_z_rotation')
+save ('n_rotation_z_data.mat','n_rotation_z_data')
+
+
+
 
 
 
@@ -135,7 +216,7 @@ for i = 3 : N
     %X = [x y];                                 % Same down comment
     %data(i - 2,:) = reshape(im_logical, 1, []); % Make it comment to find previous code
     
-   
+  
     
     fig = plot(x, y);
     saveas(fig,'fig.png')                       % Creating an image
@@ -156,5 +237,4 @@ save('new_data_1.mat', 'data', 'class');               % Save the data
 
 
 % References
-% https://se.mathworks.com/matlabcentral/newsreader/view_thread/308859.
 % Digital Imaging and Image Preprocessing course (DIIP), autumn semester, 2021.
