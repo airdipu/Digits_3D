@@ -49,6 +49,47 @@ save('data_class.mat','data_class')
 
 
 
+% Rotation on x-axis
+
+% Angle of rotation
+rotation_angle = [5, 10, 15, 20, 25, 30, 35, 40, 45];
+
+% Processing
+n_rotation_x_data = zeros(100, 3, size(data_in, 3)* ...
+    size(rotation_angle, 2));
+
+stroke_size_x_rotation = repmat(stroke_size, 1, size(rotation_angle, 2));
+
+for i=1:size(rotation_angle, 2)             % Size of rotation vector
+    for j=1:size(data_in, 3)                % Size of data (3rd dim)
+        angle = deg2rad(rotation_angle(i)); % Changing degree to radian
+
+        % Rotation around x (Using DIIP)
+        rotate_around = [cos(theta) 0 sin(theta); 0 1 0; - sin(theta) 0 ...
+            cos(theta)];
+
+        data_rotation = inputdata(1:stroke_size(j), :, j)*rotate_around;
+        
+        n_rotation_x_data(1:size(data_rotation, 1), :, ...
+            (i-1)*size(data_in, 3) + j) = bsxfun(@minus, data_rotation, ...
+            min(data_rotation, [], 1))./repmat((max(data_rotation, [] , ...
+            1) - min(data_rotation, [], 1)), size(data_rotation, 1), 1);
+        
+        % Each step of j one new matrix is adapted from the zeros matrix in the
+        % third dimension of the data_rotation matrix
+    end
+end
+
+n_rotation_x_data = repmat(data_class, size(rotation_angle, 2), 1);
+
+save ('n_rotation_x_data.mat','n_rotation_x_data')
+save ('stroke_size_x_rotation.mat','stroke_size_x_rotation')
+save ('n_rotation_x_data.mat','n_rotation_x_data')
+
+
+
+
+
 
 
 
@@ -109,3 +150,11 @@ end
 
 %data = data / 255;
 save('new_data_1.mat', 'data', 'class');               % Save the data 
+
+
+
+
+
+% References
+% https://se.mathworks.com/matlabcentral/newsreader/view_thread/308859.
+% Digital Imaging and Image Preprocessing course (DIIP), autumn semester, 2021.
