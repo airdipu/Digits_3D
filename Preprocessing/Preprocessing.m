@@ -68,7 +68,7 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
         rotate_around_x = [cos(angle) 0 sin(angle); 0 1 0; - sin(angle) ...
             0 cos(angle)];
 
-        data_rotation_x = inputdata(1:stroke_size(j), :, j)* ...
+        data_rotation_x = data_in(1:stroke_size(j), :, j)* ...
             rotate_around_x;
         
         n_rotation_x_data(1:size(data_rotation_x, 1), :, ...
@@ -84,9 +84,9 @@ end
 
 n_rotation_x_data = repmat(data_class, size(rotation_angle, 2), 1);
 
-save ('n_rotation_x_data.mat','n_rotation_x_data')
-save ('stroke_size_x_rotation.mat','stroke_size_x_rotation')
-save ('n_rotation_x_data.mat','n_rotation_x_data')
+save ('n_rotation_x_data.mat', 'n_rotation_x_data')
+save ('stroke_size_x_rotation.mat', 'stroke_size_x_rotation')
+save ('n_rotation_x_data.mat', 'n_rotation_x_data')
 
 
 
@@ -106,7 +106,7 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
         rotate_around_y = [cos(angle) 0 -sin(angle); 0 1 0; sin(angle) ...
             0 cos(angle)];
 
-        data_rotation_y = inputdata(1:stroke_size(j), :, j)* ...
+        data_rotation_y = data_in(1:stroke_size(j), :, j)* ...
             rotate_around_y;
         
         n_rotation_y_data(1:size(data_rotation_y, 1), :, ...
@@ -122,9 +122,9 @@ end
 
 n_rotation_y_data = repmat(data_class, size(rotation_angle, 2), 1);
 
-save ('n_rotation_y_data.mat','n_rotation_y_data')
-save ('stroke_size_y_rotation.mat','stroke_size_y_rotation')
-save ('n_rotation_y_data.mat','n_rotation_y_data')
+save ('n_rotation_y_data.mat', 'n_rotation_y_data')
+save ('stroke_size_y_rotation.mat', 'stroke_size_y_rotation')
+save ('n_rotation_y_data.mat', 'n_rotation_y_data')
 
 
 
@@ -144,7 +144,7 @@ for i=1:size(rotation_angle, 2)             % Size of rotation vector
         rotate_around_z = [cos(angle) sin(angle) 0; -sin(angle) ...
             cos(angle) 0; 0 0 1];
 
-        data_rotation_z = inputdata(1:stroke_size(j), :, j)* ...
+        data_rotation_z = data_in(1:stroke_size(j), :, j)* ...
             rotate_around_y;
         
         n_rotation_z_data(1:size(data_rotation_z, 1), :, ...
@@ -160,10 +160,57 @@ end
 
 n_rotation_z_data = repmat(data_class, size(rotation_angle, 2), 1);
 
-save ('n_rotation_z_data.mat','n_rotation_z_data')
-save ('stroke_size_z_rotation.mat','stroke_size_z_rotation')
-save ('n_rotation_z_data.mat','n_rotation_z_data')
+save ('n_rotation_z_data.mat', 'n_rotation_z_data')
+save ('stroke_size_z_rotation.mat', 'stroke_size_z_rotation')
+save ('n_rotation_z_data.mat', 'n_rotation_z_data')
 
+
+
+
+
+% Combining rotated x, y, z axis data
+size_data = size(data, 3) + size(n_rotation_x_data, 3) + ...
+    size(n_rotation_x_data, 3) + size(n_rotation_x_data, 3);
+
+data_combine = zeros(106, 3, size_data);
+data = data_combine(:, :, 1:size(data, 3));
+
+n_rotation_x_data = data_combine(:, :, size(data, 3) + 1:size(data, 3) ...
+    + size(n_rotation_x_data, 3));
+
+n_rotation_y_data = data_combine(:, :, size(data, 3) + ...
+    size(n_rotation_x_data, 3) + 1:size(data, 3) + ...
+    size(n_rotation_y_data, 3) + size(n_rotation_y_data, 3));
+
+n_rotation_z_data = data_combine(:,:,size(data,3) + ...
+    size(n_rotation_x_data, 3) + size(n_rotation_y_data, 3) + ...
+    1:size_data);
+
+stroke_size_combine = [stroke_size stroke_size_x_rotation ...
+    stroke_size_y_rotation stroke_size_z_rotation];
+
+% Combining classes
+n_class_combine = [data_class; n_rotation_x_data; n_rotation_y_data; ...
+    n_rotation_z_data];
+
+save ('data_combine.mat', 'data_combine') 
+save ('stroke_size_combine.mat', 'stroke_size_combine') 
+save ('n_data_combine.mat', 'n_data_combine')
+
+
+
+% Adpation 10% Approach
+slope = zeros(4, size(stroke_size_combine, 2));
+p = 0.20;     % 10% of initial data
+
+for l = 1:size(stroke_size_combine, 2)
+    slope(1:2, l) = [data_combine(round(stroke_size_combine(l)*p), 2, ...
+        m) - data_combine(1, 2, m); data_combine(round( ...
+        stroke_size_combine(l)*p), 1, l) - data_combine(1, 1, l)];
+    
+    slope(3, l) = sum(diff(data_combine(1:stroke_size_combine(l), 1, l)));
+    slope(4, l) = sum(diff(data_combine(1:stroke_size_combine(l), 2, l)));
+end
 
 
 
