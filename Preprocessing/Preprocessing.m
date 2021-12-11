@@ -272,11 +272,43 @@ for k = 1:size(data_combine, 3)
         l1 = projection_y(round((y + step_size)/step_size));
         l2 = projection_x(round((y + step_size)/step_size));
     end
-    project_y = profil_y(:, k);
-    project_x = profil_x(:, k);
+    profil_y(:, k) = project_y;
+    profil_x(:, k) = project_x;
     
 end
 
+train_profile = [profil_x; profil_y];       % Train vector for the profiles
+train_profile = [train_profile; slope];
+save('train_profile.mat', 'train_profile')
+load('data_class.mat')                      % Class data
+
+% Adapt the train class 0-9 --> 1-10
+
+train_ratio = 0.7;                          % Size of train dataset
+test_ratio = 1 - train_ratio;               % Size of test dataset
+
+id_x_Train = randsample(size(data, 3), round(train_ratio*size(data, ...
+    3)));                                   % Random index of train data
+
+% Random index of test data
+id_x_Test = setdiff(1:size(data, 3), id_x_Train)';
+
+% Train and Test data
+train_profile = train_profile(:, id_x_Train);
+test_profile = train_profile(:, id_x_Test);
+
+% Train and Test class
+train_class_profile = data_class(id_x_Train, 1);
+test_class_profile = data_class(id_x_Test, 1);
+
+% Prediction
+classes = knn(train_class_profile, train_profile, test_profile, 7);
+
+% Measurements
+correct_class = sum(classes == test_class_profile)/ ...
+    size(test_class_profile, 1);
+average_correct_class = mean(correct_class);
+accuracy = ((class - (correct_class))/classes)*100
 
 
 
