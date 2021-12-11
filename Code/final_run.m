@@ -17,6 +17,7 @@ data_Num = [repmat(0,size_Of_Data(1), 1); repmat(1, size_Of_Data(2), ...
 
 size_Of_Data_Cum = cumsum(size_Of_Data);
 size_Of_Data_Cum = [0 size_Of_Data_Cum];   % Zero for the loop (later)
+
 stroke_Size = [];                          % Rows
 
 
@@ -86,9 +87,9 @@ end
 
 Num_data_x_rot = repmat(data_Num, size(deg_Of_Rot, 2), 1);
 
-save ('n_Rot_X_Data_Set.mat', 'n_Rot_X_Data_Set')
-save ('stroke_Size_X_Rot.mat', 'stroke_Size_X_Rot')
-save ('Num_data_x_rot.mat', 'Num_data_x_rot')
+save('n_Rot_X_Data_Set.mat', 'n_Rot_X_Data_Set')
+save('stroke_Size_X_Rot.mat', 'stroke_Size_X_Rot')
+save('Num_data_x_rot.mat', 'Num_data_x_rot')
 
 
 % Rotation on y-axis
@@ -98,7 +99,7 @@ save ('Num_data_x_rot.mat', 'Num_data_x_rot')
 % Angle of rotation
 deg_Of_Rot = [5, 10, 15, 20, 25, 30, 35, 40, 45];
 
-n_Rot_Y_Data_Set = zeros(100, 3, size(input_data,3)* ...
+n_Rot_Y_Data_Set = zeros(100, 3, size(input_data, 3)* ...
     size(deg_Of_Rot, 2));
 
 stroke_Size_Y_Rot = repmat(stroke_Size, 1, size(deg_Of_Rot, 2));
@@ -109,7 +110,7 @@ for j = 1:size(input_data, 3)              % Size of data (3rd dim)
 angle = deg2rad(deg_Of_Rot(i));            % Changing degree to radian
 
 % Rotation around y axis (Using DIIP)
-R_3D_Rot = [cos(angle), 0, -sin(angle); 0, 1, 0; sin(angle), 0, ...
+R_3D_Rot = [cos(angle) 0 -sin(angle); 0 1 0; sin(angle) 0 ...
     cos(angle)];
 
 data_Set_Of_Rot = input_data(1:stroke_Size(j), :, j)*R_3D_Rot;
@@ -126,9 +127,9 @@ end
 
 Num_data_y_rot = repmat(data_Num, size(deg_Of_Rot, 2), 1);
 
-save ('n_Rot_Y_Data_Set.mat', 'n_Rot_Y_Data_Set') 
-save ('stroke_Size_Y_Rot.mat', 'stroke_Size_Y_Rot') 
-save ('Num_data_y_rot.mat', 'Num_data_y_rot')
+save('n_Rot_Y_Data_Set.mat', 'n_Rot_Y_Data_Set') 
+save('stroke_Size_Y_Rot.mat', 'stroke_Size_Y_Rot') 
+save('Num_data_y_rot.mat', 'Num_data_y_rot')
 
 % Rotation on z-axis
 
@@ -147,8 +148,8 @@ for j = 1:size(input_data, 3)              % Size of data (3rd dim)
 angle = deg2rad(deg_Of_Rot(i));            % Changing degree to radian
 
 % Rotation around z axis (Using DIIP)
-R_3D_Rot =[cos(angle), sin(angle), 0; -sin(angle), cos(angle), 0; ...
-    0, 0, 1];
+R_3D_Rot =[cos(angle) sin(angle) 0; -sin(angle) cos(angle) 0; ...
+    0 0 1];
 
 data_Set_Of_Rot = input_data(1:stroke_Size(j), :, j)*R_3D_Rot;
 
@@ -193,9 +194,9 @@ stroke_Size_Com = [stroke_Size stroke_Size_X_Rot stroke_Size_Y_Rot ...
 Num_data_Com = [data_Num; Num_data_x_rot; Num_data_y_rot; ...
     Num_data_z_rot];
 
-save ('N_data_Com.mat', 'N_data_Com') 
-save ('stroke_Size_Com.mat', 'stroke_Size_Com') 
-save ('Num_data_Com.mat', 'Num_data_Com')
+save('N_data_Com.mat', 'N_data_Com') 
+save('stroke_Size_Com.mat', 'stroke_Size_Com') 
+save('Num_data_Com.mat', 'Num_data_Com')
 
 
 % Adaptation approach
@@ -223,17 +224,16 @@ load('Num_data_Com.mat')                   % Class data
 
 
 % Projecion on y and x
-% Define equations --> find parameter
 
 step_size = 0.0500;                        % Since 3 decimal numbers for
                                            % the recording of the 
                                            % coordinates per axis
 
 % Processing for the amount of projections for y
-y_project = zeros(size(0:step_size:1, 2), 1);
+project_y = zeros(size(0:step_size:1, 2), 1);
 
 % Processing for the amount of projections for x
-x_project = zeros(size(0:step_size:1, 2), 1);
+project_x = zeros(size(0:step_size:1, 2), 1);
 
 % Processing of projections for all observations
 profils_num_y = zeros(size(0:step_size:1, 2), size(N_data_Com, 3));
@@ -244,19 +244,19 @@ for k = 1:size(N_data_Com, 3)
     for y = 0:step_size:1
         n = 0;                             % For projection on y
         m = 0;                             % For projection on x
-        for p = 1:stroke_Size_Com(k) - 1   % -1 since also use of q + 1
-             if N_data_Com(p, 1, k) < N_data_Com(p + 1, 1, k)
+        for q = 1:stroke_Size_Com(k) - 1   % -1 since also use of q + 1
+             if N_data_Com(q, 1, k) < N_data_Com(q + 1, 1, k)
                 % If the first point is smaller than the second point, the
                 % solver can find a slope
-                x1 = N_data_Com(p, 1, k);
-                x2 = N_data_Com(p + 1, 1, k);
-                y1 = N_data_Com(p, 2, k);
-                y2 = N_data_Com(p + 1, 2, k);
+                x1 = N_data_Com(q, 1, k);
+                y1 = N_data_Com(q, 2, k);
+                x2 = N_data_Com(q + 1, 1, k);
+                y2 = N_data_Com(q + 1, 2, k);
             else
-                x2 = N_data_Com(p, 1, k);
-                x1 = N_data_Com(p + 1, 1, k);
-                y2 = N_data_Com(p, 2, k);
-                y1 = N_data_Com(p + 1, 2, k);
+                x2 = N_data_Com(q, 1, k);
+                y2 = N_data_Com(q, 2, k);
+                x1 = N_data_Com(q + 1, 1, k);
+                y1 = N_data_Com(q + 1, 2, k);
             end
             l = (y2 - y1)/(x2 - x1);       % For y-slope
             ll = y1 - (l*x1);              % Intersect for y
@@ -276,57 +276,57 @@ for k = 1:size(N_data_Com, 3)
             
         end
         
-        y_project(round((y + step_size)/step_size)) = n;
-        x_project(round((y + step_size)/step_size)) = m;
+        project_y(round((y + step_size)/step_size)) = n;
+        project_x(round((y + step_size)/step_size)) = m;
     
     end
     
-    profils_num_y(:, k) = y_project;
-    profils_num_x(:, k) = x_project;
+    profils_num_y(:, k) = project_y;
+    profils_num_x(:, k) = project_x;
 end
 
 % Train vector for the profiles
 train_profile = [profils_num_x; profils_num_y];
 train_profile = [train_profile; slope_val];
 
-save('train_profile.mat','train_profile')
+save('train_profile.mat', 'train_profile')
 load('data_Num.mat')                       % Class data
 
 
 % Adaptation of train class 0-9 --> 1-10
 
-train_ratio = 0.7;                         % Size of train dataset
-test_ratio = 1 - train_ratio;              % Size of test dataset
+train_rate = 0.7;                         % Size of train dataset
 
-id_x_Train = randsample(size(new_Data, 3), round(train_ratio* ...
+x_Train = randsample(size(new_Data, 3), round(train_rate* ...
     size(new_Data, 3)));                   % Random index of train data
 
 % Random index of test data
-id_x_Test = setdiff(1:size(new_Data, 3), id_x_Train)';
+x_Test = setdiff(1:size(new_Data, 3), x_Train)';
 
 % Train and Test data
-train_prof = train_profile(:, id_x_Train);
-train_class_prof = data_Num(id_x_Train, 1);
-test_prof = train_profile(:, id_x_Test);
-test_class_prof = data_Num(id_x_Test, 1);
+train_pro = train_profile(:, x_Train);
+train_classes = data_Num(x_Train, 1);
+test_pro = train_profile(:, x_Test);
+test_classes = data_Num(x_Test, 1);
 
 % Fitting knn
-classes = knn(train_class_prof, train_prof, test_prof, 7);
+classes = knn(train_classes, train_pro, test_pro, 7);
 
 % Measurements
-correct_class = sum(classes == test_class_prof)/size(test_class_prof, 1);
+correct_classes = sum(classes == test_classes)/ ...
+    size(test_classes, 1);
 
-avg_correct_class = mean(correct_class);
+avg_correct_class = mean(correct_classes);
 
-accuracy = ((classes - (correct_class))/classes)*100
+accuracy = ((classes - (correct_classes))/classes)*100
 
 
-% Testing of single data
-load('stroke_9_0099.mat')
+% Testing of a single digit data
+load('stroke_0_0099.mat')
 x1 = pos(:, 1);
 y1 = pos(:, 2);
 plot(x1, y1)
-Class = digit_classify(pos)
+Clas = digit_classify(pos)
 
 
 
