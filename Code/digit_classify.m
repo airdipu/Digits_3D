@@ -1,18 +1,18 @@
-function C = digit_classify(testdata) 
+function C = digit_classify(testdata)
 
 % A function which performs K-Nearest Neighbour (KNN) classification with 
-% feature extract. Input data columns are x, y and z axis and rows
+% feature extraction. Data columns are x, y and z axis and rows
 % are the observational points.
-
+%
 % Only a data matrix form of a single digit entered in a loop so that, 
 % the third dimension of a matrix is used.
-
+%
 % Keep all the three file inside of data folder then continue to run the
 % file. Otherwise need to add the path for the data folder before running
 % the code.
 
 
-% Load the trainingdata and class
+% Data loading
 load('train_profile');                  % Training data features
 load('Num_data_Com');
 load('N_data_Com');
@@ -22,11 +22,11 @@ load('data_Num');
 traindata = train_profile;              % Training data
 trainclass = Num_data_Com;
 k = 3;                                  % Based on cross-validation
+
 plot(testdata(:, 1), testdata(:, 2))
 
 
-train_ratio = 0.7;                      % Training dataset ratio
-test_ratio = 1 - train_ratio;           % Testing dataset ratio
+train_ratio = 0.8;                      % Training dataset ratio
 
 id_x_Train = randsample(size(new_Data, 3), round(train_ratio* ...
     size(new_Data, 3)));                % Index of train data (random)
@@ -39,20 +39,20 @@ train_prof = train_profile(:, id_x_Train);
 test_prof = train_profile(:, id_x_Test);
 
 % Train and test data
-train_class_prof = data_Num(id_x_Train, 1);
-test_class_prof = data_Num(id_x_Test, 1);
+train_class= data_Num(id_x_Train, 1);
+test_class = data_Num(id_x_Test, 1);
 
-classes = knn(train_class_prof, train_prof, test_prof, 7);
+classes = knn(train_class, train_prof, test_prof, 7);
 
-correct_class = sum(classes == test_class_prof)/size(test_class_prof, 1);
+correct_classes = sum(classes == test_class)/size(test_class, 1);
 
-avg_correct_class = mean(correct_class);
-accuracy = ((classes - (correct_class))/classes)*100
+avarage_correct_classes = mean(correct_classes);
+accuracy = ((classes - (correct_classes))/classes)*100
 
 % Normalization of data
 for q = 1:size(testdata, 2)
     
-    testdata(:, q)=(testdata(:, q) - min(testdata(:, q)))/ ...
+    testdata(:, q) = (testdata(:, q) - min(testdata(:, q)))/ ...
         (max(testdata(:, q)) - min(testdata(:, q)));
     
 end
@@ -70,10 +70,10 @@ step_size = 0.0500;                     % Since 3 decimal numbers for
                                         % coordinates per axis
 
 % Processing for the amount of projections for y
-y_project = zeros(size(0:step_size:1, 2), 1);
+project_y = zeros(size(0:step_size:1, 2), 1);
 
 % Processing for the amount of projections for x
-x_project = zeros(size(0:step_size:1, 2), 1);
+project_x = zeros(size(0:step_size:1, 2), 1);
 
 
 for y = 0:step_size:1
@@ -84,17 +84,17 @@ for y = 0:step_size:1
                 % If the first point is smaller than the second point, the
                 % solver can find a slope
                 x1 = testdata(q, 1);
-                x2 = testdata(q + 1, 1);
                 y1 = testdata(q, 2);
+                x2 = testdata(q + 1, 1);
                 y2 = testdata(q + 1, 2);
             else
                 x2 = testdata(q, 1);
-                x1 = testdata(q + 1, 1);
                 y2 = testdata(q, 2);
-                y1 = testdata(q + 1,2);
+                x1 = testdata(q + 1, 1);
+                y1 = testdata(q + 1, 2);
             end
             l = (y2 - y1)/(x2 - x1);    % For y-slope
-            ll = y1 - (l*x1);            % Intersect for y
+            ll = y1 - (l*x1);           % Intersect for y
             x_val = (y - ll)/l;
             % Close and open interval
             if x_val >= min([x1, x2]) && x_val < max([x1, x2])
@@ -108,21 +108,21 @@ for y = 0:step_size:1
             end
             
         end
-        y_project(round((y + step_size)/step_size)) = n;
-        x_project(round((y + step_size)/step_size)) = m;
+        project_y(round((y + step_size)/step_size)) = n;
+        project_x(round((y + step_size)/step_size)) = m;
 end
 
 % Train vector for the profiles
-train_profile=[x_project; y_project];
+train_profile = [project_x; project_y];
 
 
 % Adaptation approach
 
 slope_val = zeros(4, 1);
-w = 0.20;                               % Initial data
+p = 0.20;                               % Initial data
 
-slope_val(1:2, 1) = [testdata(round(pos*w), 2) - testdata(1, 2);...
-    testdata(round(pos*w), 1) - testdata(1, 1)];
+slope_val(1:2, 1) = [testdata(round(pos*p), 2) - testdata(1, 2);...
+    testdata(round(pos*p), 1) - testdata(1, 1)];
 
 slope_val(3, 1) = sum(diff(testdata(1:pos, 1)));
 slope_val(4, 1) = sum(diff(testdata(1:pos, 2)));
@@ -133,8 +133,8 @@ data = [train_profile; slope_val];      % Features for test data
 % KNN
 
 C = zeros(1, 1);                        % Class vector based on knn
-% Determine the distance
-for h = 1:size(data, 2)
+% Determining the distance
+for dist = 1:size(data, 2)
     dist_train = zeros(size(traindata, 2), 1);
     for j = 1:size(traindata, 2)
     dist_train(j) = (sum((traindata(:, j) - data).^2))^0.5;
@@ -190,3 +190,4 @@ end
 % https://towardsdatascience.com/machine-learning-basics-with-the-k-nearest-neighbors-algorithm-6a6e71d01761
 % https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm
 % https://www.javatpoint.com/k-nearest-neighbor-algorithm-for-machine-learning
+% https://codereview.stackexchange.com/questions/46027/k-nearest-neighbours-in-matlab

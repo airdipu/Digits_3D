@@ -40,5 +40,4 @@ end
 
 
 % References
-% Exercise class for Pattern Recognition and Machine Learning for autumn,
-% 2021
+% Exercise class for Pattern Recognition and Machine Learning for autumn, 2021
